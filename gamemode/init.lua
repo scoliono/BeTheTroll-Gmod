@@ -1,4 +1,3 @@
-
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 
@@ -12,23 +11,23 @@ include( 'shared.lua' )
    Desc: Give the player the default spawning weapons/ammo
 ---------------------------------------------------------*/
 function GM:PlayerInitialSpawn( ply )
-	while table.Count(player.GetAll()) < 6 do
-		ply:SetTeam(3)
-	end
-	ply:SetTeam(3)
-	local rdmGen = math.random(1,2)
-		ply:SetTeam(rdmGen)
-	end
+	
+	rdmGen = math.random(1,2)
+	ply:SetTeam(rdmGen)
 
-	if trollPlayers > purePlayers then
+	if math.floor(trollPlayers/3) > purePlayers then
+		// not enough innocents
 		ply:SetTeam(2)
-	elseif purePlayers > trollPlayers then
+	elseif purePlayers > math.floor(trollPlayers/3) then
+		// there are too many innocents
 		ply:SetTeam(1)
 	end
 end
 
 function GM:PlayerSpawn (ply)
 	if ply:Team() == 1 then
+		ply:SetModel("models/player/breen.mdl")
+	
 		ply:SetGravity(0.25)
 		ply:SetRunSpeed(750)
 		
@@ -55,8 +54,12 @@ function GM:PlayerSpawn (ply)
 		ply:Give("weapon_stunstick")
 	end
 	if ply:Team() == 2 then
+		ply:SetModel("models/player/alyx.mdl")
+	
 		ply:Give("weapon_357")
 		ply:Give("weapon_shotgun")
 	end
-	
+	if ply:Team() == 3 then
+		ply:SetModel("models/player/kleiner.mdl")
+	end
 end

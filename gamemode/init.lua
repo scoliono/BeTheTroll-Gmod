@@ -3,25 +3,33 @@ AddCSLuaFile( "shared.lua" )
 
 include( 'shared.lua' )
 
-
 // Serverside only stuff goes here
 
-/*---------------------------------------------------------
-   Name: gamemode:PlayerLoadout( )
-   Desc: Give the player the default spawning weapons/ammo
----------------------------------------------------------*/
+function CheckMinPlayers(pl)
+	if table.Count(player.GetAll()) < 3 then
+		PrintMessage(HUD_PRINTTALK, "Not enough players to start a game. Checking again in 15 seconds...")
+	else
+		timer.Stop("CheckMinPlayersTimer")
+		rdmGen = math.random(1,2)
+		pl:SetTeam(rdmGen)
+		
+		trollPlayers = team.NumPlayers(1)
+		purePlayers = team.NumPlayers(2)
+		
+		if math.floor(trollPlayers/3) > purePlayers then
+			// not enough innocents
+			pl:SetTeam(2)
+		elseif purePlayers > math.floor(trollPlayers/3) then
+			// there are too many innocents
+			pl:SetTeam(1)
+		end
+	end
+end
+
 function GM:PlayerInitialSpawn( ply )
 	
-	rdmGen = math.random(1,2)
-	ply:SetTeam(rdmGen)
-
-	if math.floor(trollPlayers/3) > purePlayers then
-		// not enough innocents
-		ply:SetTeam(2)
-	elseif purePlayers > math.floor(trollPlayers/3) then
-		// there are too many innocents
-		ply:SetTeam(1)
-	end
+	timer.Create("CheckMinPlayersTimer", 15, 0, function() CheckMinPlayers() end)
+	
 end
 
 function GM:PlayerSpawn (ply)
